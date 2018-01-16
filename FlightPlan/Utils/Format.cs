@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace FlightPlan
+namespace FlightPlan_NS
 {
 	internal static class Format
 	{
