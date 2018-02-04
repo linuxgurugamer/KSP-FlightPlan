@@ -115,6 +115,7 @@ namespace FlightPlan_NS
 
 		private void OnDestroy()
 		{
+            Log.Info("OnDestory");
 			config.SetValue (this.name, winRect);
 			config.SetValue ("showAsUT", showAsUT);
 			config.save ();
@@ -294,7 +295,7 @@ namespace FlightPlan_NS
 				//if (appLauncherButton != null)
                     toolbarControl.SetFalse ();
 				//else
-					onToggle ();
+					//onToggle ();
 			}
 			GUILayout.EndVertical ();
 			GUI.DragWindow ();

@@ -1,3 +1,6 @@
+1.0.5.1
+	Fixed bug where you would have to click the close button 2x to close the window (toolbar buttons were ok)
+
 1.0.5
 	Adoption by LGG
 	Added Changelog
