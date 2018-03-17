@@ -1,3 +1,7 @@
+1.0.6
+	Fixed download URL in the .version file
+	Added support (via UICore) for the ClickThroughBlocker
+
 1.0.5.1
 	Fixed bug where you would have to click the close button 2x to close the window (toolbar buttons were ok)
 

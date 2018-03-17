@@ -115,7 +115,7 @@ namespace FlightPlan_NS
 
 		private void OnDestroy()
 		{
-            Log.Info("OnDestory");
+            //Debug.Log("OnDestory");
 			config.SetValue (this.name, winRect);
 			config.SetValue ("showAsUT", showAsUT);
 			config.save ();
