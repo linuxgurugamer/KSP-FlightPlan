@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{498E40CE-0C56-4150-871F-69914C08BD34}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FlightPlan</RootNamespace>
+    <RootNamespace>FlightPlan_NS</RootNamespace>
     <AssemblyName>FlightPlan</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -78,6 +78,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FlightPlan.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ToolbarRegistration.cs" />
     <Compile Include="Utils\Format.cs" />
     <Compile Include="Utils\KACWrapper.cs" />
   </ItemGroup>

@@ -1,4 +1,11 @@
+1.0.6.1
+	Updated toolbarController usage to use registration
+	REMOVED SETTINGS PAGE, not needed
+	Removed all references to the Blizzy toolbar
+	Removed old toolbar code
+
 1.0.6
+	Updated for 1.4.1
 	Fixed download URL in the .version file
 	Added support (via UICore) for the ClickThroughBlocker
 

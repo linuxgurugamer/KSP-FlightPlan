@@ -1,4 +1,4 @@
-﻿
+﻿#if false
 using System;
 using System.IO;
 using System.Collections;
@@ -46,3 +46,4 @@ namespace FlightPlan_NS
     }
 
 }
+#endif

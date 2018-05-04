@@ -58,10 +58,6 @@ namespace FlightPlan_NS
 		private List<PlanEntry> flightPlan = new List<PlanEntry>();
 		private DateTime lastTime;
 
-#if TOOLBAR
-        private ApplicationLauncherButton appLauncherButton;
-		private IButton toolbarButton;
-#endif
 		private UICore.UICore UI;
 
 		public void Awake() {
@@ -72,7 +68,10 @@ namespace FlightPlan_NS
 			instance = this;
 		}
 
-		private void Start() {
+        internal const string MODID = "FlightPlan_NS";
+        internal const string MODNAME = "Flight Plan";
+
+        private void Start() {
             //Instance = this;
 			available = (PSystemSetup.Instance.GetSpaceCenterFacility ("TrackingStation").GetFacilityLevel () > 0);
 			lastTime = DateTime.Now;
@@ -85,9 +84,7 @@ namespace FlightPlan_NS
 			winId = GUIUtility.GetControlID (FocusType.Passive);
 			winRect = config.GetValue<Rect> (this.name, new Rect (0, 0, Screen.width / 2, Screen.height / 2));
 			showAsUT = config.GetValue<bool> ("showAsUT", false);
-#if TOOLBAR
-            GameEvents.onGUIApplicationLauncherReady.Add(CreateLauncher);
-#endif
+
             GameEvents.onHideUI.Add (OnHide);
 			GameEvents.onShowUI.Add (OnUnHide);
 			GameEvents.onGamePause.Add (OnHide);
@@ -96,21 +93,19 @@ namespace FlightPlan_NS
 			KACWrapper.InitKACWrapper ();
 			if (KACWrapper.APIReady)
 				KACWrapper.KAC.onAlarmStateChanged += KACWrapper_KAC_onAlarmStateChanged;
-#if !TOOLBAR
+
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
             toolbarControl.AddToAllToolbars(onAppTrue, onAppFalse,
                         ApplicationLauncher.AppScenes.SPACECENTER |
                         ApplicationLauncher.AppScenes.TRACKSTATION |
                         ApplicationLauncher.AppScenes.FLIGHT |
                         ApplicationLauncher.AppScenes.MAPVIEW,
-                        "FlightPlan_NS",
+                        MODID,
                         "flightPlanButton",
                         "FlightPlan/Textures/flight-plan-icon",
                         "FlightPlan/Textures/flight-plan-icon-toolbar",
-                        "Flight Plan"
+                        MODNAME
                 );
-            toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<FP>().useBlizzy);
-#endif
         }
 
 		private void OnDestroy()
@@ -121,14 +116,10 @@ namespace FlightPlan_NS
 			config.save ();
 
 			UnlockControls ();
-#if !TOOLBAR
+
             toolbarControl.OnDestroy();
             Destroy(toolbarControl);
-#else
-            DestroyLauncher ();
 
-			GameEvents.onGUIApplicationLauncherReady.Remove(CreateLauncher);
-#endif
             GameEvents.onHideUI.Remove (OnHide);
 			GameEvents.onShowUI.Remove (OnUnHide);
 			GameEvents.onGamePause.Remove (OnHide);
@@ -145,46 +136,7 @@ namespace FlightPlan_NS
 		{
 
 		}
-#if TOOLBAR
-        private void CreateLauncher() {
-			if (ToolbarManager.ToolbarAvailable && HighLogic.CurrentGame.Parameters.CustomParams<FP>().useBlizzy) {
-				toolbarButton = ToolbarManager.Instance.add ("FlightPlan", "AppLaunch");
-				toolbarButton.TexturePath = "FlightPlan/Textures/flight-plan-icon-toolbar";
-				toolbarButton.ToolTip = "Flight Plan Window";
-				toolbarButton.Visible = true;
-				toolbarButton.OnClick += (ClickEvent e) => {
-					onToggle();
-				};
-			}
-			else if (appLauncherButton == null)
-			{
-				appLauncherButton = ApplicationLauncher.Instance.AddModApplication(
-					onAppTrue,
-					onAppFalse,
-					null,
-					null,
-					null,
-					null,
-					ApplicationLauncher.AppScenes.SPACECENTER |
-					ApplicationLauncher.AppScenes.TRACKSTATION |
-					ApplicationLauncher.AppScenes.FLIGHT |
-					ApplicationLauncher.AppScenes.MAPVIEW,
-					GameDatabase.Instance.GetTexture("FlightPlan/Textures/flight-plan-icon", false)
-				);
-			}
-		}
 
-		public void DestroyLauncher()
-		{
-			if (appLauncherButton != null) {
-				ApplicationLauncher.Instance.RemoveModApplication (appLauncherButton);
-			}
-			if (toolbarButton != null) {
-				toolbarButton.Destroy ();
-				toolbarButton = null;
-			}
-		}
-#endif
 
         public void onAppTrue()
 		{
@@ -237,7 +189,7 @@ namespace FlightPlan_NS
 		}
 
 		private void OnGUI() {
-            toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<FP>().useBlizzy);
+
             if (active && !hidden)
 			{
 				if (refresh) {
@@ -292,10 +244,7 @@ namespace FlightPlan_NS
 			UI.Layout.HR (5);
 
 			if (UI.Layout.Button ("Close", UI.Palette.Col ("green"))) {
-				//if (appLauncherButton != null)
                     toolbarControl.SetFalse ();
-				//else
-					//onToggle ();
 			}
 			GUILayout.EndVertical ();
 			GUI.DragWindow ();
