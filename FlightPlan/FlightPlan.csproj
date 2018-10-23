@@ -57,7 +57,7 @@
     <Reference Include="ToolbarControl">
       <HintPath>R:\KSP_1.5.1_dev\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
     </Reference>
-    <Reference Include="UICore, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UICore, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>R:\KSP_1.5.1_dev\GameData\000_UICore\Plugins\UICore.dll</HintPath>
     </Reference>
