@@ -1,3 +1,6 @@
+1.0.6.2
+	Version bump for 1.5 rebuild
+
 1.0.6.1
 	Updated toolbarController usage to use registration
 	REMOVED SETTINGS PAGE, not needed
