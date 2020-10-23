@@ -64,7 +64,7 @@
       <HintPath>$(KSPDIR)\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
     </Reference>
     <Reference Include="UICore">
-      <HintPath>R:\KSP_1.10.1_dev\GameData\000_UICore\Plugins\UICore.dll</HintPath>
+      <HintPath>$(KSPDIR)\GameData\000_UICore\Plugins\UICore.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
