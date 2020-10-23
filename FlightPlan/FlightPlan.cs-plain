@@ -10,8 +10,9 @@ using ToolbarControl_NS;
 namespace FlightPlan_NS
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public partial class FlightPlan : MonoBehaviour
+    public class FlightPlan : MonoBehaviour
     {
+        //public static FlightPlan Instance;
         ToolbarControl toolbarControl;
 
         private enum EntryType
@@ -59,11 +60,7 @@ namespace FlightPlan_NS
         private List<PlanEntry> flightPlan = new List<PlanEntry>();
         private DateTime lastTime;
 
-        private UICore.UICore UI;
-        bool uiCoreActive = true, oldUiCoreActive = true;
-
-        internal static GUIStyle guiLabelStyle, guiBlueLabelStyle;
-        internal static GUIStyle guiButtonStyle, guiGreenButtonStyle, guiWhiteLabelStyle;
+        //private UICore.UICore UI;
 
         public void Awake()
         {
@@ -73,23 +70,14 @@ namespace FlightPlan_NS
                 return;
             }
             instance = this;
-            LoadData();
         }
 
         internal const string MODID = "FlightPlan_NS";
         internal const string MODNAME = "Flight Plan";
 
-        void LoadUICore()
-        {
-            if (UI == null)
-            {
-                UI = new UICore.UICore();
-                UI.LoadConfig("GameData/FlightPlan/Skin/FlightPlan.cfg");
-            }
-        }
         private void Start()
         {
-            //colors = new Dictionary<Color, Texture2D>();
+            colors = new Dictionary<Color, Texture2D>();
 
             //Instance = this;
             available = (PSystemSetup.Instance.GetSpaceCenterFacility("TrackingStation").GetFacilityLevel() > 0);
@@ -97,10 +85,9 @@ namespace FlightPlan_NS
             config = PluginConfiguration.CreateForType<FlightPlan>();
             config.load();
 
-            if (uiCoreActive)
-            {
-                LoadUICore();
-            }
+            //UI = new UICore.UICore ();
+            //UI.LoadConfig ("GameData/FlightPlan/Skin/FlightPlan.cfg");
+
             winId = GUIUtility.GetControlID(FocusType.Passive);
             winRect = config.GetValue<Rect>(this.name, new Rect(0, 0, Screen.width / 2, Screen.height / 2));
             showAsUT = config.GetValue<bool>("showAsUT", false);
@@ -226,10 +213,7 @@ namespace FlightPlan_NS
                     refresh = false;
                 }
 
-                if (uiCoreActive)
-                    winRect = UI.Layout.Window(winId, winRect, RenderWindow, "Flight Plan");
-                else
-                    winRect = GUILayout.Window(winId, winRect, RenderWindow, "Flight Plan");
+                winRect = GUILayout.Window(winId, winRect, RenderWindow, "Flight Plan");
 
                 if (winRect.Contains(Event.current.mousePosition))
                 {
@@ -259,61 +243,29 @@ namespace FlightPlan_NS
 
             if (vessel != null)
             {
-                if (uiCoreActive)
-                    UI.Layout.Label("Vessel:");
-                else
-                    GUILayout.Label("Vessel:");
+                GUILayout.Label("Vessel:");
                 TargetFocusButton(vessel);
-                if (uiCoreActive)
-                    UI.Layout.Label("Current SOI:");
-                else
-                    GUILayout.Label("Current SOI:");
+
+                GUILayout.Label("Current SOI:");
                 TargetFocusButton(vessel.mainBody);
 
                 if (vessel.targetObject != null)
                 {
-                    if (uiCoreActive)
-                        UI.Layout.Label("Target:");
-                    else
-                        GUILayout.Label("Target:");
+                    GUILayout.Label("Target:");
                     TargetFocusButton(vessel.targetObject);
                 }
 
-                if (uiCoreActive)
-                    UI.Layout.Label("Plan entries:", UI.Palette.Col("blue"));
-                else
-                {
-                    GUILayout.Label("Plan entries:", guiBlueLabelStyle);
-                }
+                GUILayout.Label("Plan entries:");
                 RenderFlightPlan();
             }
 
-            if (uiCoreActive)
-            {
-                UI.Layout.HR(5);
-                showAsUT = UI.Layout.Toggle(showAsUT, "Universal Time");
-                uiCoreActive = UI.Layout.Toggle(uiCoreActive, "UI Core Active");
-                UI.Layout.HR(5);
-            }
-            else
-            {
-                GUILayout.Label("", GUILayout.Height(5));
-                showAsUT = GUILayout.Toggle(showAsUT, "Universal Time");
-                uiCoreActive = GUILayout.Toggle(uiCoreActive, "UI Core Active");
-                if (uiCoreActive != oldUiCoreActive)
-                {
-                    oldUiCoreActive = uiCoreActive;
-                    if (uiCoreActive)
-                    {
-                        LoadUICore();
-                    }
-                    SaveData();
-                }
-                GUILayout.Label("", GUILayout.Height(5));
-            }
-            // missing green for GUILayout.Button
-            if ((uiCoreActive && UI.Layout.Button("Close", UI.Palette.Col("green"))) ||
-                (!uiCoreActive && GUILayout.Button("Close", guiGreenButtonStyle)))
+            //UI.Layout.HR (5);
+            GUILayout.Label("", GUILayout.Height(5));
+            showAsUT = GUILayout.Toggle(showAsUT, "Universal Time");
+            //UI.Layout.HR (5);
+            GUILayout.Label("", GUILayout.Height(5));
+
+            if (GUILayout.Button("Close"))
             {
                 toolbarControl.SetFalse();
             }
@@ -337,9 +289,7 @@ namespace FlightPlan_NS
 
             if (mo != null)
             {
-
-                if ((uiCoreActive && UI.Layout.Button(mo.Discoverable.RevealName(), UI.Palette.Col("green"))) ||
-                (!uiCoreActive && GUILayout.Button(mo.Discoverable.RevealName(), guiGreenButtonStyle)))
+                if (GUILayout.Button(mo.Discoverable.RevealName()))
                 {
                     if (HighLogic.LoadedSceneIsFlight)
                         MapView.EnterMapView();
@@ -442,21 +392,15 @@ namespace FlightPlan_NS
         {
             double totalDeltaV = 0;
             string text = "";
-            Color color;
-            if (uiCoreActive)
-                color = UI.Palette.Col("gray");
-            else
-                color = Color.gray;
+            //Color color = UI.Palette.Col ("gray");
+            Color color = Color.gray;
             foreach (PlanEntry entry in flightPlan)
             {
                 switch (entry.type)
                 {
                     case EntryType.Encounter:
                         text = " encounter " + entry.obj.celestialBody.RevealName() + " (" + Format.Number(entry.magnitude, "m") + ")";
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("green");
-                        else
-                            color = Color.green;
+                        color = Color.green; // UI.Palette.Col ("green");
                         break;
                     case EntryType.Escape:
                         text = " escape to " + entry.obj.celestialBody.RevealName();
@@ -466,87 +410,63 @@ namespace FlightPlan_NS
                         text = " perform maneuver ";
                         text += Format.Number(entry.magnitude, "m/s");
                         totalDeltaV += entry.magnitude;
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("yellow");
-                        else
-                            color = Color.yellow;
+                        color = Color.yellow; // UI.Palette.Col ("yellow");
                         break;
                     case EntryType.Burn:
                         text = " burn in " + entry.obj.celestialBody.RevealName() + "'s atmosphere";
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("red");
-                        else
-                            color = Color.red;
+                        color = Color.red; // UI.Palette.Col ("red");
                         break;
                     case EntryType.Crater:
                         text = " make a new crater on " + entry.obj.celestialBody.RevealName();
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("red");
-                        else
-                            color = Color.red;
+                        color = Color.red; // UI.Palette.Col ("red");
                         break;
                     case EntryType.SnacksLanded:
                         text = " eat snacks landed at " + entry.obj.celestialBody.RevealName();
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("yellow");
-                        else
-                            color = Color.yellow;
+                        color = Color.yellow; // UI.Palette.Col ("yellow");
                         break;
                     case EntryType.DivingCourse:
                         text = " diving course in " + entry.obj.celestialBody.RevealName() + "'s ocean";
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("yellow");
-                        else
-                            color = Color.yellow;
+                        color = Color.yellow; // UI.Palette.Col ("yellow");
                         break;
                     case EntryType.SnacksOrbit:
                         text = " eat snacks orbiting " + entry.obj.celestialBody.RevealName();
-                        if (uiCoreActive)
-                            color = UI.Palette.Col("yellow");
-                        else
-                            color = Color.yellow;
+                        color = Color.yellow; // UI.Palette.Col ("yellow");
                         break;
                 }
+                GUI.color = color;
                 GUILayout.BeginHorizontal();
 
                 if (entry.UT > 0)
                 {
-                    if (uiCoreActive)
-                    {
-                        UI.Layout.LabelRight(
-                            (showAsUT ?
-                                "At " + KSPUtil.dateTimeFormatter.PrintDateCompact(entry.UT, true, true) :
-                                "In " + KSPUtil.dateTimeFormatter.PrintDateDeltaCompact(
-                                    entry.UT - Planetarium.GetUniversalTime(),
-                                    true,
-                                    true,
-                                    true
-                                )
-                            ),
-                            color,
-                            GUILayout.Width(150)
-                        );
-                    }
-                    else
-                    {
-                        guiLabelStyle.normal.textColor = color;
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label((showAsUT ?
-                                "At " + KSPUtil.dateTimeFormatter.PrintDateCompact(entry.UT, true, true) :
-                                "In " + KSPUtil.dateTimeFormatter.PrintDateDeltaCompact(
-                                    entry.UT - Planetarium.GetUniversalTime(),
-                                    true,
-                                    true,
-                                    true
-                                )
-                            ),
-                                guiLabelStyle,
-                            GUILayout.Width(150));
-                    }
+#if false
+					UI.Layout.LabelRight (
+						(showAsUT ?
+							"At " + KSPUtil.dateTimeFormatter.PrintDateCompact (entry.UT, true, true) :
+							"In " + KSPUtil.dateTimeFormatter.PrintDateDeltaCompact (
+								entry.UT - Planetarium.GetUniversalTime(),
+								true,
+								true,
+								true
+							)
+						),
+						color,
+						GUILayout.Width (150)
+					);
+#endif
+                    GUILayout.FlexibleSpace();
+                    GUILayout.Label((showAsUT ?
+                            "At " + KSPUtil.dateTimeFormatter.PrintDateCompact(entry.UT, true, true) :
+                            "In " + KSPUtil.dateTimeFormatter.PrintDateDeltaCompact(
+                                entry.UT - Planetarium.GetUniversalTime(),
+                                true,
+                                true,
+                                true
+                            )
+                        ),
+                        GUILayout.Width(150));
                 }
-                guiButtonStyle.normal.textColor = color;
-                if ((uiCoreActive && UI.Layout.ButtonLeft(text, color, GUILayout.MinWidth(230))) ||
-                    (!uiCoreActive && GUILayout.Button(text, guiButtonStyle, GUILayout.MinWidth(230))))
+
+                if (GUILayout.Button(text, GUILayout.MinWidth(230)))
                 {
                     if (!MapView.MapIsEnabled)
                         MapView.EnterMapView();
@@ -561,20 +481,17 @@ namespace FlightPlan_NS
 
                 GUILayout.EndHorizontal();
             }
-            if (uiCoreActive)
-            {
-                UI.Layout.HR(10);
-                UI.Layout.LabelAndText("Total Δv", Format.Number(totalDeltaV, "m/s"), UI.Palette.Col("blue"), Color.white);
-            }
-            else
-            {
-                GUILayout.Label("", guiWhiteLabelStyle, GUILayout.Height(10));
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Total Δv" + ": ", guiBlueLabelStyle);
-                GUILayout.Label(Format.Number(totalDeltaV, "m/s"), guiWhiteLabelStyle);
-                GUILayout.EndHorizontal();
-            }
+            //UI.Layout.HR (10);
+            GUILayout.Label("", GUILayout.Height(10));
+            //UI.Layout.LabelAndText ("Total Δv", Format.Number(totalDeltaV, "m/s"), UI.Palette.Col("blue"), Color.white);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Total Δv" + ": ");
+            GUILayout.Label(Format.Number(totalDeltaV, "m/s"));
+            GUILayout.EndHorizontal();
         }
+
+        static Dictionary<Color, Texture2D> colors;
+        Texture2D tex;
 
         private void KACButton(PlanEntry entry, Color color, string text)
         {
@@ -601,9 +518,27 @@ namespace FlightPlan_NS
                     break;
             }
 
-            guiButtonStyle.normal.textColor = color;
-            if ((uiCoreActive && UI.Layout.Button("A", color, GUILayout.Width(20))) ||
-                (!uiCoreActive && GUILayout.Button("A", guiButtonStyle, GUILayout.Width(20))))
+            if (!colors.ContainsKey(color))
+            {
+                tex = new Texture2D(24, 24);
+                for (int y = 0; y < tex.height; y++)
+                {
+                    for (int x = 0; x < tex.width; x++)
+                    {
+
+                        tex.SetPixel(x, y, color);
+
+                    }
+                }
+
+                tex.Apply();
+                colors.Add(color, tex);
+            }
+            else
+                tex = colors[color];
+
+            // not tex, but set text color to color
+            if (GUILayout.Button(tex, "A", GUILayout.Width(20)))
             {
                 String tmpID = KACWrapper.KAC.CreateAlarm(
                     alarmType,

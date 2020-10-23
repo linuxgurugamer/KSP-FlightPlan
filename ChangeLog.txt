@@ -1,5 +1,9 @@
 ChangeLog
 
+1.1.1
+	Some optimization (removed unnecessary loops)
+	Added mode to use or not use the UICore mode
+
 1.1.0
 	Added InstallChecker
 	Updated for KSP 1.8
